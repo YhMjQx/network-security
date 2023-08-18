@@ -64,9 +64,9 @@
 
 ## 三、使用Windows部署DNS服务器
 
-1.使用Linux（bind服务器）
+#### 1.使用Linux（bind服务器） 
 
-2.DNS服务器分类
+#### 2.DNS服务器分类
 
 - 主要名称服务器：存放区域（二级域）中相关的设置，存放的是区域文件的正本数据
 - 辅助名称服务器：存放的是副本数据，从主要名称服务器赋值过来，不能修改
@@ -95,7 +95,7 @@
 
 shifem.com是他的二级域，a.是他的子域，www是他的主机头
 
-3.DNS记录
+#### 3.DNS记录
 
 - A记录：主机记录，域名和IP地址的映射关系
 - CNAME：别名记录
@@ -109,7 +109,7 @@ shifem.com是他的二级域，a.是他的子域，www是他的主机头
 
 创建一个反向查找区域，这里的网段是根据下面这个对应的<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230816205919808.png" alt="image-20230816205919808" style="zoom:200%;" />
 
-4.区域传送
+#### 4.区域传送
 
 - 将主要名称服务器的区域文件传送到辅助名称服务器上
 - 区域文件传送使用的是TCP协议
@@ -129,3 +129,107 @@ shifem.com是他的二级域，a.是他的子域，www是他的主机头
 ![image-20230816212319938](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230816212319938.png)
 
 <img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230816212312974.png" alt="image-20230816212312974" style="zoom:200%;" />
+
+## 四、分析DNS流量
+
+#### 1.DNS报文字段
+
+- ID
+
+- flags（标志位） 
+
+  <img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230817225549641.png" alt="image-20230817225549641" style="zoom:200%;" />
+
+  <img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230817225614067.png" alt="image-20230817225614067" style="zoom:200%;" />
+
+  - 第一位：标识报文类型（0是请求，1是响应）
+  - 第2-5位：opcode（查询种类）
+  - 第6位：是否是权威应答（响应报文中存在）
+  - 第7位：一个UDP报文为512字节，指示是否截断超过的部分
+  - 第8位：是否请求递归
+  - 第9位：允许递归标识
+  - 第10-12位：保留位
+  - 第13-16位：应答码（响应报文中存在）
+    - 0    没有错误
+    - 1    格式错误
+    - 2    服务器错误
+    - 3    名字错误
+    - 4    服务器不支持
+    - 5    拒绝
+    - 6-15    保留
+
+- Questions： 请求段中的问题记录数
+
+- Answer RRs：回答段中的应答记录数
+
+- Authority RRs：授权段中的授权记录数
+
+- Addition RRs：附加段总的附加记录数
+
+- 
+
+
+ 
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818194018683.png" alt="image-20230818194018683" style="zoom:200%;" />
+
+这个是在DNS服务器上配置转发器的情况，为了更加快速的完成DNS服务，黑色的线（win10向DNS服务器发送请求，服务器去找到外部的二级域名DNS，从外部二级域名DNS服务器上获取到win10想要的域名信息，然后外部二级域名DNS服务器发送给server2016，server2016会先将域名信息缓存在自己的服务器中，再由server2016发送给win10），红色的线（win10向server2016发送DNS请求，server2016发现自己有该域名的数据信息，直接响应给win10）
+
+## 五、DNS欺骗
+
+实验：在server上安装web服务器，让kali（使用ettercap工具）欺骗win10，使得win10访问其他网页时，会被跳转到该服务器上
+
+1.在server上安装web服务器
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818203027962.png" alt="image-20230818203027962" style="zoom:200%;" />
+
+并开启https的443端口（证书去网上随便搞一个）
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818204743704.png" alt="image-20230818204743704" style="zoom:200%;" />
+
+2.修改ettercap中的文件，
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818203224452.png" alt="image-20230818203224452" style="zoom:200%;" />
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818203405308.png" alt="image-20230818203405308" style="zoom:200%;" />
+
+这里101.37.65.91是www.woniuxy.com的IP地址，意思是访问www.sohu.com是让其跳转到www.woniuxy.com上去，其中一个A是代表了IPv4的意思
+
+3.开始执行欺骗
+
+- 首先，这是服务器的IP和网关
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818203900073.png" alt="image-20230818203900073" style="zoom:200%;" />
+
+- 接下来是ettercap的操作，我们的目的是欺骗win10（192.168.19.66）的访问，我们需要先进行ARP欺骗，然后再进行DNS欺骗
+  - ARP欺骗
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818203938669.png" alt="image-20230818203938669" style="zoom:200%;" />
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818204046380.png" alt="image-20230818204046380" style="zoom:200%;" />
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818204209098.png" alt="image-20230818204209098" style="zoom:200%;" />
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818204243638.png" alt="image-20230818204243638" style="zoom:200%;" />
+
+DNS欺骗
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818204517663.png" alt="image-20230818204517663" style="zoom:200%;" />
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818204541618.png" alt="image-20230818204541618" style="zoom:200%;" />
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818204611463.png" alt="image-20230818204611463" style="zoom:200%;" />
+
+上面的操作和命令的操作效果是一样的
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818205047990.png" alt="image-20230818205047990" style="zoom:200%;" />
+
+4.效果
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818205146524.png" alt="image-20230818205146524" style="zoom:200%;" />
+
+如果此时我进行登录，而有人对我进行抓包，我的账号和密码就会被别人知道
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818205249666.png" alt="image-20230818205249666" style="zoom:200%;" />
+
+<img src="C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20230818205413023.png" alt="image-20230818205413023" style="zoom:200%;" />
