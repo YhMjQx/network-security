@@ -107,5 +107,68 @@ SELECT DISTINCT(classname) FROM (SELECT c.classname AVG(g.score) AS AvgScore FRO
 SELECT classid COUNT(studentid) AS stunum FROM student WHERE GROUP BY classid  ORDER BY stunum LIMIT 1; 
 ```
 
+# ==SQL基本函数的使用==
+
+## SUBSTR（下标从一开始）
+
+**字符串截取**
+
+```sql
+#语法
+#SELECT SUBSTR('XXXX',M,N);
+#截取字符串从第m个位置开始往后截取n个
+SELECT SUBSTR('我是你爸爸',1,4); 
+#结果：我是你爸
+```
+
+## ASCII（返回第一个字符的ASCII值）
+
+```sql
+#语法
+#SELECT ASCII('XXXX');  
+SELECT ASCII('我是你爸爸');
+```
+
+## CHAR_LENGTH（返回字符串长度）
+
+```sql
+SELECT CHAR_LENGTH('我是你爸爸');   #结果返回5
+```
+
+## CONCAT（字符串拼接）
+
+```sql
+SELECT CONCAT('HELLO','WORLD');
+#结果返回 HELLO WORLD
+```
+
+## HEX（取十六进制）
+
+```sql
+SELECT HEX('H');  #结果返回48，相对应的
+```
+
+
+
+
+
+## 应用
+
+```sql
+#列出所有学生的姓
+SELECT DISTINCT(SUBSTR(sname,1)) FROM student;
+
+#通过十六进制查询
+#记住，SQL查询中字符串不需要添加单引号
+SELECT * FROM student WHERE sname=0xE6B288E99B85E7BBBF
+
+#获取当前用户
+SELECT USER();
+#查看当前版本号
+SELECT VERSION();
+#查看当前数据库名称
+SELECT DATABASE();
+```
+
 
 
