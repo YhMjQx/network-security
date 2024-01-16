@@ -233,3 +233,88 @@ select myseq.nextval from dual;
 
 ### 那么如何在插入的时候使用序列从而达到自增长的目的呢
 
+使用方法： 序列对象.nextval （整体充当为一个值，这个值是可以自动增长的）
+
+
+
+比如说建了一张表，此时需要给表中的列插入数据，使用自增长，跟随原来的 nextval 开始，如下图，原来的 nextval 是 105 ，那么现在 nextval 就要从 106 开始
+
+建的表（demo）：
+
+![image-20240116202047598](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240116202047598.png)
+
+初始的 nextval
+
+![image-20240116202116421](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240116202116421.png)
+
+现在我们使用自增长插入数据
+
+```sql
+insert into demo(id,name) values(myseq.nextval,'张三');
+```
+
+每次运行这句sql，得到的 id 都是会自增1的
+
+![image-20240116202639580](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240116202639580.png)
+
+### 数据备份与还原
+
+```
+exp  功能：直接将某个用户的表空间中的对象导出
+imp  功能：将备份或者导出的数据进行还原
+```
+
+#### 备份
+
+eg：`exp 用户名/密码 file=导出后的文件存放路径`
+
+如果不知道用户名，在自己的设备上的话可以试试 localhost 或者 root 密码`exp root root/p-0p-0p-0 file=C:\Oracle.dmp`
+
+![image-20240116203642200](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240116203642200.png)
+
+#### 导入
+
+从root用户中备份的数据导入到 newuser 用户中
+
+```
+imp newuser/密码 file=C:\Oracle.dmp fromuser=root touser=newuser
+```
+
+其中 newuser/密码 这是执行 imp 指令时需要登录的账号和密码，只有登陆成功了才可以成功执行指令，要想成功导入，还需要登录的用户名密码与导入的用户是同一个用户，即 newuser/密码 中的 newuser 和 touser=newuser 中的 newuser 是一个用户
+
+因为在没有DBA权限的情况下是无法在一个用户中将备份好的数据，导入到另一个用户中去，所以需要通过相同用户登陆的条件来完成
+
+![image-20240116212737340](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240116212737340.png)
+
+> **记住：Oracle的形式为 ： Oracle ： 数据库服务 -》表空间 -》 多张表** 一个用户就是一个数据库服务，因此一个用户对应一个表空间，一个表空间当中又有多张表
+
+更多关于数据备份与还原的操作命令请转到[Oracle expdp/impdp 及 exp/imp 命令详解-CSDN博客](https://blog.csdn.net/u011046671/article/details/103540758?ops_request_misc=%7B%22request%5Fid%22%3A%22170541228416800184119015%22%2C%22scm%22%3A%2220140713.130102334..%22%7D&request_id=170541228416800184119015&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~sobaiduend~default-2-103540758-null-null.142^v99^pc_search_result_base2&utm_term=Oracle exp imp&spm=1018.2226.3001.4187)
+
+
+
+存储过程/函数/程序 ：
+
+-  SQL语句的批处理（通过一些特定的逻辑词，函数...将SQL语句串到一起形成一个SQL语句的批处理）
+- Linux Shell，Powershell 类似 
+- 索引
+- 触发器
+- GRANT  REVOKE
+- 视图
+- 事务：多条 n * 类的语句比多一起成功最后结果才算成功，否则，只要有一条语句失败，那么整体就是失败的
+
+![image-20240116215123647](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240116215123647.png)
+
+- ...
+
+
+
+## 总结
+
+- 我们首先在基础课程阶段，先解决知识面的问题，但是一定要总结整理，寻找共性，结合实际场景应用
+- 目前大部分企业都在基于开源的解决方案进行开发和运营，MySQL -> MariaDB , Linux , PostgreSQL , JAVA , Python ， PHP 等
+- Oracle目前时长占有率不高，IBM 的全套解决方案。安可，支IOE：IBM  Oracle  EMC
+- 学习过程中要有方法，有计划，有目标，不要只是被动跟着老师讲的去学
+
+
+
+
