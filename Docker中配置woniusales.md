@@ -44,6 +44,25 @@ docker exec -it centos7 /bin/bash
 
 ## 二、tomcat上搭建woniusales
 
+### 配置JAVA环境
+
+#### 1.解压压缩包
+
+将jdk压缩包解压放在 /usr/java/ 目录下，该目录是自己创建的，自己想放在那个目录下都可以，然后解压即可
+
+![image-20240126192602257](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240126192602257.png)
+
+#### 2.配置环境变量
+
+直接在 ~/.bash_profile 文件中配置即可
+
+```
+写入下面两句指令
+export JAVA_HOME=/usr/java  #这个就是存放jdk解压后的压缩包的目录位置
+PATH=$JAVA_HOME/bin 
+```
+
+
 ### 安装和配置MySQL5.6
 
 #### 1.安装mysql5.6
