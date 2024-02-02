@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ymqyyds</title>
+</head>
+<body>
+    <!-- 文本 -->
+
+    <!-- 通常情况下 标签都是成对出现的 -->
+    <!-- 但是目前在HTML页面中，文本不再建议使用font标签 -->
+    <!-- 通常情况下，文本，图片都会被放置于容器之中，例如 表格 DIV -->
+    <font color="red" >welcome to my world,you will fell threat</font> <br/>
+    <font color="blue" size="5">欢迎来到我的世界，来看看哥有多牛逼！</font>
+
+    <!-- 使用DIV来包裹一段文本，设置字体大小和颜色 -->
+    <!-- 被Style属性包裹的CSS样式 -->
+    <div style="color:rgb(132, 0, 255); font-size: 20px;">欢迎来到我的世界，来看看哥有多牛逼！</div>    
+    <div style="font-family: 'Courier New', Courier, monospace; background-color: rgba(255, 0, 0, 0.51); font-size: 30px;">欢迎来到我的世界，来看看哥有多牛逼！</div>
+    <div style="border: 2; font-size: 20px; font-family: Verdana, Geneva, Tahoma, sans-serif; color: rgb(255, 0, 0);">终于结束了第一期课程，并开始第二期，新的一年，新的开始，加油，年薪三十万等着我，我杨明强马上就来</div>
+
+    <!-- 图片 -->
+    <img src="image/nginx+Tomcat集群.png" width="1000" />
+    <div > <img src="image/nginx+Tomcat集群.png" width="1000" /></div>
+    <div> <img src="image/nginx+Tomcat集群.png" height="500"></div>
+
+    <!-- 超链接,标签为 a ，   可以使用 target="_blank"使超链接在新的页面中打开 -->
+    <a href="http://www.woniuxy.com" >这网站，男人都爱看</a> <br/>
+    <a href="http://www.baidu.com" >有什么问题就来此处</a> <br/>
+    <div><a href="http://www.woniuxy.com" target="_blank">想看什么这里都有</a></div>
+    <div><a href="http://localhost/learn/test.html" target="_blank">来看看自己吧哈哈</a></div>
+    <br/>
+
+
+
+
+
+    <!-- 表格：由行和列组成，主要使用三个标签 <table> 定义表格整体属性 <tr> 定义一行 <td> 定义一列 -->
+    <table border="10">
+        <tr>
+            <td>hello</td>
+            <td>world</td>
+        </tr>
+        <tr>
+            <td>hello</td>
+            <td>world</td>
+        </tr>
+        <tr>
+            <td>hello</td>
+            <td>world</td>
+        </tr>
+    </table>
+    <p/> <!--也表示换行-->
+    <!-- width宽度考虑列，height高度考虑行 -->
+    <table border="20">
+        <tr height="100">
+            <td width="100">第一行第一列</td>
+            <td>第一行第二列</td>
+            <td>第一行第三列</td>
+        </tr>
+        <tr height="200">
+            <td>第二行第一列</td>
+            <td width="200">第二行第二列</td>
+            <td>第二行第三列</td>
+        </tr>
+        <tr height="300">
+            <td >第三行第一列</td>
+            <td>第三行第二列</td>
+            <td width="300">第三行第三列</td>
+        </tr>
+    </table>
+
+
+
+
+    
+
+    <!-- 表单 -->
+    <input type="datetime" placeholder="请输入用户名">  <!--文本框标签为 input-->
+    <input type="password" placeholder="请输入密码"/> <!--placeholder 表示文本框中的提示信息-->
+    <input type="button" value="点击登录"/>
+    <button>点我来看男人最爱看的</button>    <!-- 按钮，可直接使用button标签 -->
+    <br/>
+    <!-- 下拉框标签为select -->
+    <select>
+        <option>选项一</option> <!--option为下拉框中的选项-->
+        <option>选项二</option>    
+        <option selected>选项三</option> <!--selected表示默认该选项-->
+        <option>选项四</option>
+        <option>选项五</option>
+    </select>
+    <br/>
+
+    <input type="datetime-local" >
+    <input type="text" placeholder="想看什么呢宝贝儿桀桀">
+    <input type="password" placeholder="准备交多少呢桀桀">
+    <input type="button" value="快快确定吧宝贝儿桀桀，后边的选项根本不用管桀桀">
+    <select>
+        <option>100牛子</option>
+        <option>200牛子</option>
+        <option>300牛子</option>
+        <option>400牛子</option>
+        <option selected>500牛子</option>
+    </select>
+    
+</body>
+</html>
