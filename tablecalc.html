@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>tablewoniucalc</title>
+    <style>
+        /* 类选择器 以 . 开头 .后跟类别 */
+        .button {
+            background-color: grey;    /* 设置类别为button的表格的背景为蓝色 */
+            margin: auto;                       /* 设置类别为button的表格水平居中 */
+        }
+        /* 层次选择器 */
+        .button tr td {
+            background-color: rgb(0, 255, 255);   /* 设置类别为button的表格中的单元格的背景颜色为white */
+            width: 25%;
+            font-size: 30px;
+            text-align: center;
+        }
+        /* 容器配置器 */
+        .point-red {
+            background-color: red;  /* 容器背景颜色 */
+            width: 20px;  /* 容器宽度 */
+            height: 20px; /* 容器高度 */
+            float: left; /* 容器不自动换行，向左靠齐 */
+            margin-left: 10px; /* 容器与容器之间相隔10个像素 */
+            border-radius: 50%; /* 修改容器棱角，去掉棱角内切圆以外的部分，内切圆半径即容器直径的50%，也因此此时变为一个圆*/
+
+        }
+        .point-green {
+            background-color: green;
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-left: 10px;
+            border-radius: 50%;
+
+        }
+        .point-blue {
+            background-color: blue;
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-left: 10px;
+            border-radius: 50%;
+        }
+        .title {
+            font-size: 28px;
+            color: rgb(0, 0, 0);
+            float: right;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 表格两行一列，展示顶部和结果栏 -->
+    <table  align="center" width="450px" height="120px" border="0" bgcolor="grey" cellspacing="5px">
+        <tr height="50px" >
+            <td>
+                <!-- 在该表格的第一行设置三个容器，分别是如下三个 -->
+               <div class="point-red"></div> 
+               <div class="point-green"></div> 
+               <div class="point-blue"></div> 
+               <div class="title">表格版蜗牛计算器</div>
+            </td>
+        </tr>
+        <tr >
+            <td bgcolor="white" style="border: solid red 4px;">
+
+            </td>
+        </tr>
+    </table>
+
+    <!-- 表格五行四列完成计算器按钮 -->
+    <!--由于该表格使用了类选择器，就可以去掉其中部分属性-->
+    <!-- <table class="button" align="center" width="450px" height="400px" border="0" bgcolor="yellow" cellspacing="4px"> --> 
+    <table class="button" width="450px" height="400px" border="0" cellspacing="4px">
+      
+        <tr>
+            <td>AC</td>
+            <td>+/-</td>
+            <td>%</td>
+            <td>÷</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>*</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+            <td>-</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>2</td>
+            <td>1</td>
+            <td>+</td>
+        </tr>
+        <tr>
+            <td>0</td>
+            <td>删除</td>
+            <td>.</td>
+            <td>=</td>
+        </tr>
+    </table>
+</body>
+</html>
