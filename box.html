@@ -1,0 +1,56 @@
+<!-- 盒模型及CSS基础样式 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=<device-width>, initial-scale=1.0">
+    <title>盒模型与CSS样式</title>
+    <style>
+        #outer {
+            /* 边框的样式 */
+            width: 908px;
+            height: 345px;
+            border: dashed 3px green;
+            margin: auto;
+            margin-top: 200px;
+        }
+
+        .inner {
+
+            float: left;  /*让div靠左摆放*/
+
+            /* 边框的样式 */
+            width: 450px;
+            /* height: 300px;  */
+            border: solid 2px red;
+            /* border-bottom: dashed 2px blue; */
+            margin: auto;
+            /* margin-top: 100px; */
+            
+            /*让文字垂直居中*/
+            /*line-height: 300px;*/  /*通过设定文字的高度为border的高度即可*/
+            padding: 150px 0px;  /* 或设定padding后跟两个值，分别表示上下和左右的padding,此时就不需要在手动设置border的高度了，否则高度会额外增加 */
+                 /*，上下各150，左右为0，此时高度就变为150+150+2*25，高度全都是由padding挤出来的*/                   
+            /*让文字水平居中*/
+            text-align: center;  
+            
+
+            /* 文字的样式 */
+            color: rgb(46, 32, 245);
+            /* font-size: 25px; */
+            font-family: 微软雅黑 幼圆 verdana;
+            font-style: italic;  /*文本样式为斜体*/
+            font-weight: bold;  /*文本样式为加粗*/
+            text-decoration:underline;  /*为文本设置下划线*/
+
+        }
+    </style>
+</head>
+<body>
+    <!-- 使用父容器包裹两个子容器 -->
+    <div id="outer">
+        <div class="inner">你好啊，欢迎来到我的世界 <br/>你好啊，欢迎来到我的世界 </div>
+        <div class="inner">你好啊，欢迎来到我的世界 <br/>你好啊，欢迎来到我的世界 </div>
+    </div>  
+</body>
+</html>
