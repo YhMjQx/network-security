@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIVcalc</title>
+
+    <style>
+        /* 设计顶部样式栏 */
+        #top {
+            background-color: grey;
+            width: 450px;
+            height: 50px;
+            margin: auto;
+            margin-top: 100px;
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+        .point {
+            width: 20px;
+            height: 20px;
+            float: left;
+            margin-left: 10px;
+            margin-top: 15px;
+            border-radius: 50%;
+
+        }
+        #top .red {
+            background-color: red;
+        }
+        #top .green {
+            background-color: green;
+        }
+        #top .blue {
+            background-color: blue;
+        }
+        #top .calc-title {
+            float: right;
+            margin-right: 20px;
+            margin-top: 8px;
+            color: whitesmoke;
+            font-size: 25px;
+        }
+
+        /* 设计状态显示栏 */
+        #result-out {
+            width: 450px;
+            height: 60px;
+            background-color: grey;
+            margin: auto;
+        }
+        #result-in {
+            width: 400px;
+            height: 45px;
+            background-color: whitesmoke;
+            margin: auto;
+            /* margin-bottom: 5px; */
+            font-size: 35px;
+            text-align: right;
+            padding-right: 10px;
+
+        }
+
+        /* 设置按钮区域样式 */
+        #button {
+            width: 450px;
+            height: 400px;
+            background-color: grey;
+            margin: auto;
+            padding-top: 10px;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+        #button div {
+            /* width: 20%; */
+            width: 100px;
+            height: 70px;
+            float: left;
+            /* margin-left: 4%; */
+            margin-left: 10px;
+            margin-bottom: 10px;
+            background-color: aqua;
+            text-align: center;
+            line-height: 70px;
+            font-size: 25px;
+        }
+
+        /* 使用伪类选择器设置鼠标悬停效果 */
+        #button div:hover {
+            background-color: orange;
+            font-size: 35px;
+        }
+    </style>
+
+    <script>
+        var isGotResult = false; 
+
+        //响应单击数字事件
+        function clickNum(num) {
+            var result=document.getElementById("result-in"); //这里我是为了获得id="result-in"的元素，然后再利用下面的代码让元素中的内容为我所传的参数
+           
+            // result.innerHTML 的返回类型是字符串
+            //这里加的是字符串，而不是数字相加。比如第一次num为7，第二次num为8，那么第一次结果为7，第二次结果就为78
+            //也可以用 result.innerHTML = result.innerHTML + num; 
+
+            //首先利用一个大的if，判断前面的数字是否为之前通过 = 得到的值
+           if (isGotResult == false) {
+                //如果不是，就正常连接数字
+                result.innerHTML += num;
+           }
+           else {
+                //如果是，此时再点击数字应该先清空原来的结果，再单独显示新的数字
+                //但是我们还要考虑一种情况，如果是得出了结果，又点击了操作符，那么此时应该也是直接连接新的数字
+                //所以需要先判断，目前最后一个字符是否为操作符
+                var result = document.getElementById("result-in");
+                var len=result.innerHTML.length;
+                var lastchar=result.innerHTML[len-1];
+                if (lastchar == '+' || lastchar == '-' || lastchar == '*' || lastchar == '/' || lastchar == '%') {
+                    //如果最后一个字符是操作符，那么就直接连接新的数字，并重置 isGotResult = false
+                    result.innerHTML += num;
+                    isGotResult = false;
+
+                }
+                else {
+                    //如果最后一个字符不是操作符，那么就清空结果栏，并单独显示新的数字，并重置isGotResult = false
+                    result.innerHTML="";
+                    result.innerHTML += num;
+                    isGotResult = false;
+                }
+
+           }
+
+        }
+
+
+        //响应单击运算符事件
+        function clickOperator(operator) {
+            var result = document.getElementById("result-in");
+            var len=result.innerHTML.length;
+            var lastchar=result.innerHTML[len-1];  //找到字符串的最后一个字符，判断最后一个字符是否为操作符
+            if (lastchar == '+' || lastchar == '-' || lastchar == '*' || lastchar == '/' || lastchar == '%') {
+                result.innerHTML = result.innerHTML.substr(0,len-1) + operator;  //如果是，就拿掉最后一个新的字符串，并用新点击的操作符替换掉
+                
+            }
+            else {
+                result.innerHTML += operator;  //如果最后一个字符不是操作符，则正常连接即可
+
+            }
+            
+        }
+
+        //计算结果，使用 eval 函数，该函数可将字符串作为代码执行
+        function getResult() {
+            var result = document.getElementById("result-in");
+            result.innerHTML=eval(result.innerHTML);
+
+            isGotResult = true;
+           
+        }
+
+        //清空结果
+        //注意不要用clear关键字，否则会无响应
+        function clearResult() {
+            // result = document.getElementById("result-in");
+            // result.innerHTML="";
+            document.getElementById("result-in").innerHTML="";
+        }
+
+        //删除最后一位字符
+        function backSpace() {
+            var result = document.getElementById("result-in");
+            //  上面这行代码表示返回的是了整个元素，此时做的任何修改都会体现在元素本身
+            //  如果var result = document.getElementById("result-in").innerHTML  则表示result是一个字符串，在这个函数当中，只是一个临时变量，无法做到对元素本身的修改
+            var len = result.innerHTML.length;  //取字符串长度
+            result.innerHTML = result.innerHTML.substr(0,len-1);
+
+        }
+
+         //点击小数点
+        function clickPoint(point) {
+            var result = document.getElementById("result-in");
+            var len=result.innerHTML.length;
+            var lastchar=result.innerHTML[len-1];
+
+            //为防止小数点重复输入的问题，判断最后一个字符是否为小数点
+            if (lastchar == '.' ) {
+                //如果是，则直接退出，不允许输入
+                exit ;
+            }
+            else {
+                //如果不是，则再正常加上小数点
+                result.innerHTML += point;
+            }
+
+            //为解决得出结果后点击小数点，小数点会跟在结果后的问题。先判断刚刚是不是得出了结果
+            if (isGotResult == true) {
+                //如果是，则清空结果栏，并重置显示为 0.
+                result.innerHTML="";
+                result.innerHTML += '0'+ point;
+                isGotResult = false;
+            }
+            
+        }
+
+       
+
+    </script>
+</head>
+<body>
+    <div id="top">
+        <div class="point red"></div>
+        <div class="point green"></div>
+        <div class="point blue"></div>
+        <div class="calc-title">DIV版蜗牛计算器</DIV></div>
+    </div>
+
+    <div id="result-out">
+        <div id="result-in">
+
+        </div>
+    </div>
+    
+    <div id="button">
+        <div onclick="clearResult()">AC</div>
+        <div onclick="getLastChar()">+/-</div>
+        <div onclick="clickOperator('%')">%</div>
+        <div onclick="clickOperator('/')">÷</div>
+        <div onclick="clickNum(innerHTML)">7</div>
+        <div onclick="clickNum(innerHTML)">8</div>
+        <div onclick="clickNum(innerHTML)">9</div>
+        <div onclick="clickOperator('*')">*</div>
+        <div onclick="clickNum(innerHTML)">4</div>
+        <div onclick="clickNum(innerHTML)">5</div>
+        <div onclick="clickNum(innerHTML)">6</div>
+        <div onclick="clickOperator('-')">-</div>
+        <div onclick="clickNum(innerHTML)">1</div>
+        <div onclick="clickNum(innerHTML)">2</div>
+        <div onclick="clickNum(innerHTML)">3</div>
+        <div onclick="clickOperator('+')">+</div>
+        <div onclick="clickNum(innerHTML)">0</div>
+        <div onclick="backSpace()">删除</div>
+        <div onclick="clickPoint('.')">.</div>
+        <div onclick="getResult()">=</div>
+    </div>
+</body>
+</html>
