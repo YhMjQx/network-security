@@ -269,3 +269,14 @@ function getResult() {
 }
 ```
 
+#### 九、解决正负号替换操作
+
+```js
+<script>
+    function getReverse() {
+        var result = document.getElementById("result-in");
+        result.innerHTML = eval('0' - result.innerHTML);
+}
+</script>
+```
+
