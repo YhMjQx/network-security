@@ -202,8 +202,11 @@
             
         }
 
-       
-
+        function getReverse() {
+            var result = document.getElementById("result-in");
+            result.innerHTML = eval('0' - result.innerHTML);
+       }
+        
     </script>
 </head>
 <body>
@@ -222,7 +225,7 @@
     
     <div id="button">
         <div onclick="clearResult()">AC</div>
-        <div onclick="getLastChar()">+/-</div>
+        <div onclick="getReverse()">+/-</div>
         <div onclick="clickOperator('%')">%</div>
         <div onclick="clickOperator('/')">÷</div>
         <div onclick="clickNum(innerHTML)">7</div>
