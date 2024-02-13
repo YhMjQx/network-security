@@ -150,6 +150,51 @@
     
     }
     //re_replace();
-    
+
+    function re_email() {
+        //2811403517@qq.com
+        $source = "2811403517@qq.com";
+        // $pattern = "/@qq\.com$/";
+        $pattern = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/";
+        $result = preg_match($pattern,$source);
+        if($result) {
+            echo "qqemail匹配成功"."<br>";
+        }
+        else {
+            echo "qqemail匹配失败"."<br>";
+        }
+
+        //13772816626@163.com
+        $source = "13772816626@163.com";
+        // $pattern = "/^1[3-9]\d{9}@163.com$/";
+        // $pattern = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/";
+        $pattern = "/^[_a-z0-9-]+@[a-z0-9]+\.[a-z]{2,}$/";  //简化版
+        $result = preg_match($pattern,$source);
+        if($result) {
+            echo "163email匹配成功"."<br>";
+        }
+        else {
+            echo "163email匹配失败"."<br>";
+        }
+
+
+
+        //yhmjqx@gmail.com
+        $source = "yhmjqx@gmail.com";
+        // $pattern = "/@gmail\.com$/";
+        $pattern = "/^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,})$/";
+
+        $result = preg_match($pattern,$source);
+        if($result) {
+            echo "gmailemail匹配成功"."<br>";
+        }
+        else {
+            echo "gmailemail匹配成功"."<br>";
+
+        }
+
+    }
+
+    re_email();
 
 ?>
