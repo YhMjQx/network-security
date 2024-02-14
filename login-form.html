@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ymqyyds</title>
+    <style>
+
+        div {
+            width: 310px;
+            height: 75px;
+            margin: auto;
+        }
+
+        .title {
+            color: rgb(6, 255, 52);
+            font-size: 30px;
+            text-align: center;
+            margin-top: 200px;
+            padding-bottom: 10px;  /*和底部下一个容器相隔一点距离*/
+            font-weight: bold;  /*加粗*/
+            font-style: italic;  /*斜体*/
+            
+        } 
+
+        input {
+            width: 300px;
+            height: 50px;
+            background-color: antiquewhite;
+            border-radius: 5px;  /*让边框看起来圆润一点*/
+            text-align: center;
+            margin: auto;
+        }
+
+        button {
+            width: 310px;
+            height: 50px;
+            background-color: fuchsia;
+            color: chartreuse;
+            font-size: 20px;
+            font-weight: bold;  /*加粗*/
+            font-style: italic;  /*斜体*/
+            border-radius: 5px;  /*让边框看起来圆润一点*/
+        }
+
+        .footer {
+            width: 500px;
+            height: 50px;
+            border: solid 0px blue;
+            margin: auto;
+            text-align: center;
+            color: aliceblue;
+        }
+
+    </style>
+</head>
+
+<body background="../image/code.png" style="background-repeat: repeat;background-attachment:fixed;background-size:100%">
+
+    <div class="title top-100 font-30">登 录</div>
+
+    <form action="../PHP/login.php" method="post">
+        <div class="login">
+            <input type="text" name="username" />
+        </div>
+        <div class="login" >
+            <input  type="password" name="password" />
+        </div>
+        <div class="login">
+            <input type="text" name="vericode" />
+        </div>
+        <div class="login" >
+            <button type="submit">登 录</button>
+        </div>
+    </form>
+
+    <div class="footer top-100"> 
+        版权所有@华明网络安全科技有限公司
+    </div>
+
+
+</body>
+</html>
