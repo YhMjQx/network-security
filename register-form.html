@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ymqyyds</title>
+    <script type="text/javascript" src="../jquery-3.4.1.min.js"></script>
+    
+    <style>
+
+        div {
+            width: 310px;
+            height: 75px;
+            margin: auto;
+        }
+
+        .title {
+            color: rgb(6, 255, 52);
+            font-size: 30px;
+            text-align: center;
+            margin-top: 200px;
+            padding-bottom: 10px;  /*和底部下一个容器相隔一点距离*/
+            font-weight: bold;  /*加粗*/
+            font-style: italic;  /*斜体*/
+            
+        } 
+
+        .intention {
+            color: red;
+            font-size: 15px;
+            text-align: center;
+           
+        }
+
+        input {
+            width: 300px;
+            height: 50px;
+            background-color: antiquewhite;
+            border-radius: 5px;  /*让边框看起来圆润一点*/
+            text-align: center;
+            margin: auto;
+        }
+
+        button {
+            width: 310px;
+            height: 50px;
+            background-color: fuchsia;
+            color: chartreuse;
+            font-size: 20px;
+            font-weight: bold;  /*加粗*/
+            font-style: italic;  /*斜体*/
+            border-radius: 5px;  /*让边框看起来圆润一点*/
+        }
+
+        .footer {
+            width: 500px;
+            height: 50px;
+            border: solid 0px blue;
+            margin: auto;
+            text-align: center;
+            color: aliceblue;
+        }
+
+    </style>
+
+    <!-- <script>
+        function doPost() {
+            //获取表单元中的值，使用函数$("#id").val()
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var nickname = $("#nickname").val();
+            var qq = $("#qq").val();
+            //通过字符串方式将上面的值拼接为正文
+            var param = "username=" + username + "&password=" + password + "&nickname=" + nickname + "&qq=" + qq;
+            //利用ajax发送post请求，并获取服务器的响应
+            //利用js内置的函数 $.post()，其中有三个参数
+            //参数一：请求的网页
+            //参数二：请求的正文
+            //参数三：js处理响应的匿名函数（因为服务器将响应返回给浏览器需要使用js代码进行处理，就利用的是此函数）
+            $.post("../PHP/register.php",param,function(data){
+                //处理服务器响应的js代码
+                window.alert(data);
+                // $("#username").val(data);
+            })
+        }
+    </script> -->
+</head>
+
+<body background="../image/code.png" style="background-repeat: repeat;background-attachment:fixed;background-size:100%">
+
+    <div class="title top-100 font-30">用户注册</div>
+    <div class="intention top-150 font-10">用户注册 请按文本框提示输入信息</div>
+
+    <form action="../PHP/register.php" method="post">
+        <div class="login">
+            <input type="text" value="username" name="username" id="username" />
+        </div>
+        <div class="login" >
+            <input  type="password" value="password" name="password" id="password"/>
+        </div>
+        <div class="login">
+            <input type="text" value="nickname" name="nickname" id="nickname"/>
+        </div>
+        <div class="login">
+            <input type="text" value="qq" name="qq" id="qq"/>
+        </div>
+        <div class="login" >
+            <button type="submit">注 册</button>
+        </div>
+    </form>
+
+    <div class="footer top-100"> 
+        版权所有@华明网络安全科技有限公司
+    </div>
+
+</body>
+</html>
