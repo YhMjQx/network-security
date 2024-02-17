@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript" src="../jquery-3.4.1.min.js"></script>
     <title>ymqyydss</title>
     <style>
         table {
@@ -26,7 +27,28 @@
     </style>
 
     <script>
+        function doPop($articleid) {
+            // window.alert($articleid);
+        
+            var result = window.confirm("确定删除改文章吗？");
+            // window.confirm();  函数会弹窗给出确定和取消两个选项，点击确定返回true
+            if (result != true) {
+                window.alert("取消删除");
+                return false;
+            }
 
+            $.post("articlePop.php","articleid="+$articleid,function(data){
+                if(data == "delete-pass") {
+                    window.alert("删除成功");
+                    location.reload(); // 刷新此页面
+                    // location.href="article-list.php";  // 重新跳转到自己的页面，相当于刷新
+                }
+                else {
+                    window.alert("删除失败"+data);
+                }
+            });
+
+    }
     </script>
 </head>
 <body>
@@ -71,55 +93,14 @@
         // echo '<td>updatetime</td>';
         // echo  '</tr>';
 
-        function doPop($articleid) {
-            //配置数据库连接信息
-            $conn = mysqli_connect('localhost','root','p-0p-0p-0','woniunote') or die("数据库连接失败");
-            
-            // //设置数据库字符集编码
-            // mysqli_set_charset($conn,'utf8');
-            
-            // //设置sql查询语句
-            // $sql = "select articleid , headline , updatetime from article";
-
-            // //执行sql查询语句
-            // $result = mysqli_query($conn,$sql);
-            
-            // //将查询结构的结果集转换为数组
-            // $rows = mysqli_fetch_all($result);         
-
-            //拼接删除文章的sql语句
-            $popsql = "delete from article where articleid=$articleid;";
-
-            //执行删除文章的sql语句
-            $popresult = mysqli_query($conn,$popsql);
-            // echo $popresult;
-
-
-            if (mysqli_affected_rows($conn) > 0) {
-                echo "删除成功"."<br>";
-            }
-            else {
-                echo "删除失败"."<br>";
-
-            }
-
-        }
-
         foreach($rows as $row) {
             echo '<tr>';
             echo '<td>'.$row[0].'</td>';
             echo '<td><a href="read-article.php?id='.$row[0].'">'.$row[1].'</a></td>';
             echo '<td>'.$row[2].'</td>';
-            // echo '<td><button onclick="'.doPop($row[0]).'">删 除</button></td>';
+            echo '<td><button onclick="doPop('.$row[0].')">删 除</button></td>';
             echo  '</tr>';
         }
-        // foreach($rows as $row) {
-            
-
-        // }
-
-
-        // echo '</table>';
 
         //输出完结果关闭数据库
         mysqli_close($conn);
