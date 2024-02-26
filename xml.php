@@ -106,3 +106,60 @@
     //     echo $node->nodeValue."<br>";
     //     // 输出结果和正常的很不一样，为了解决这个问题我们需要加入两个参数  $doc2->preserveWhiteSpace = false  $doc2->formatOutput = true 然后这段代码运行才能成功
     // }
+
+
+/**将数组内容写入XML */
+    $student01 = array("name"=>"杨明强","age"=>"19","addr"=>"陕西汉中","phone"=>"13845678910");
+    $student02 = array("name"=>"齐晨婕","age"=>"20","addr"=>"陕西西安","phone"=>"18745612310");
+    $student03 = array("name"=>"卢瑞征","age"=>"20","addr"=>"陕西西安","phone"=>"13925836910");
+    $student04 = array("name"=>"刘文轩","age"=>"19","addr"=>"陕西汉中","phone"=>"18725814710");
+    $student05 = array("name"=>"田宇桐","age"=>"20","addr"=>"陕西榆林","phone"=>"15529790215");
+    $students = array($student01,$student02,$student03,$student04,$student05);
+
+
+    $doc = new DOMDocument('1.0','utf8'); // 先实例化DOMDocument对象
+    $doc->preserveWhiteSpace = false; // 不保留空格
+    $doc->formatOutput = true; // 格式化输出XML节点格式
+
+    //  创建根节点，并设置其id属性和值
+    $class = $doc->createElement('class');  //创建根节点
+    $class->setAttribute('id','安全2204'); //设置根节点class的属性名和属性值
+    $doc->appendChild($class);  //将创建好的根节点放在文件中
+
+    //为class根节点创建子节点
+    foreach($students as $index=>$student) {
+        // 创建student节点,并设置属性和属性值,将其添加在class根节点下
+        $nodestudent = $doc->createElement('student');
+        $nodestudent->setAttribute('sequence',$index+1);
+        $class->appendChild($nodestudent);
+        foreach($student as $key=>$value) {
+            // 创建student下的子节点，并将其添加在student子节点下
+            $nodename = $doc->createElement($key); 
+            $nodestudent->appendChild($nodename);
+
+            // 给student下的每一个子节点设置值
+            $nodevalue = $doc->createTextNode($value);
+            $nodename->appendChild($nodevalue);
+        }
+    }
+
+    // 最后一定要保存文件
+    $doc->save('../write.xml');
+
+
+
+    /**使用XPath操作XML XPath定位*/
+    $doc = new DOMDocument();
+    $doc->preserveWhiteSpace = false;
+    $doc->load('../student.xml');
+    $xpath = new DOMXPath($doc);  //实例化XPath对象
+
+    // 定义一个表达式
+    // $expression = "/school/class[@id='WNCDC086']/student[@sequence='2']/school";
+    // $expression = "/school/class[@id='WNCDC085']/student[@sequence='3']/name";
+    // $expression = "//class[@id='WNCDC085']/student[@sequence='2']/name";
+    // $expression = "//class[2]/student[1]/name";  //查找xml文件下school根节点下的第二个class节点下的第1个student的name 
+    // $expression = "//class[2]/student/school[contains(text(),'邮电')]";  // 模糊查询xml文件下school根节点第二个class节点下的student中的school中包含 邮电 两个字的学校
+    $expression = "//class[2]/student[age=21]/name";
+    $nodes = $xpath->query($expression);  //返回的是找到的所有节点，返回的还是一个数组，即使只找到一个
+    echo $nodes->item(0)->nodeValue;
