@@ -77,9 +77,8 @@
         echo "<br>";
     }
     echo "</p>";
-?>
 
-    /**读取 firewall.xml的所有端口 */
+/**读取 firewall.xml的所有端口 */
     $doc1->load('../firewalld.xml');
     $nodes = $doc1->getElementsByTagName('port');
     foreach($nodes as $node) {
@@ -163,3 +162,8 @@
     $expression = "//class[2]/student[age=21]/name";
     $nodes = $xpath->query($expression);  //返回的是找到的所有节点，返回的还是一个数组，即使只找到一个
     echo $nodes->item(0)->nodeValue;
+
+
+?>
+
+    
