@@ -9,16 +9,22 @@
     class DB {
         // 为DB类定义数据库连接的必要属性,并给定默认值
         // 由于在类实例化时通过传参，使用类方法可以对这些属性进行赋值，于是边设置为私有属性，更安全
-        private $host = '';//localhost
-        private $username = '';//root
-        private $password = '';//p-0p-0p-0
-        private $database = '';//woniunote
+        // private $host = '';//localhost
+        // private $username = '';//root
+        // private $password = '';//p-0p-0p-0
+        // private $database = '';//woniunote
+
+        var $host = '';//localhost
+        var $username = '';//root
+        var $password = '';//p-0p-0p-0
+        var $database = '';//woniunote
+
         // 将数据库连接对象定义为类属性
         private $conn = null;
         
         // 定义一个方法，用于建立数据库连接
         function connect_db() {
-            $this->conn = mysqli_connect($this->host,$this->username,$this->password,$this->database) or die("数据库连接失败");
+            $this->conn = mysqli_connect($this->host,$this->username,$this->password,$this->database) or die("数据库连接失败 <br>");
             mysqli_set_charset($this->conn,'utf8');
             return $this->conn;
         }
@@ -75,6 +81,20 @@
             mysqli_close($this->conn);
         }
 
+        // 当类进行序列化时自动调用，并且返回一个数组，定义包含要序列化的类属性
+        function __sleep()
+        {
+            echo "DB类正在序列化： <br>";
+            return array('host','username','password','database');
+        }
+
+        // 在类进行反序列化时调用，并且可以在该方法中定义恢复状态的代码，以便于让反序列化得到的实例可以直接调用类方法
+        function __wakeup()
+        {
+            echo "DB类正在被反序列化： <br>";
+            // 因为类实例被反序列化之后，属性都是有值的，因此直接创建连接即可
+            $this->connect_db();
+        }
     }
 
 ?>
