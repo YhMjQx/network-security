@@ -140,6 +140,22 @@ def change_password(username,newpassword):
             #     print(v)
 
 
+# 针对数据库连接进行封装操作
+def query_mysql(sql):
+    conn = pymysql.connect(host='localhost',user='root',password='p-0p-0p-0',database='woniunote',port=3306,charset='utf8')
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
+def update_mysql(sql):
+    conn = pymysql.connect(host='localhost',user='root',password='p-0p-0p-0',database='woniunote',port=3306,charset='utf8',autocommit=True)
+    cursor = conn.cursor()
+    cursor.execute(sql)
+    # conn.commit()
+    conn.close()
+
 
 if __name__ == '__main__':  # 直接 main 然后回车就可以自动弹出这一行
     pass
