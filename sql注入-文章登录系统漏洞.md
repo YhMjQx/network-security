@@ -232,6 +232,11 @@ function create_dbcon() {
     return $conn;
 }
 
+function login_result($result) {
+    echo '<script>window.alert("'.$result.'")</script>';
+    echo '<script>location.href="./login.html"</script>';
+}
+
 ?>
 ```
 
@@ -290,5 +295,194 @@ $result = mysqli_query($conn,$sql) or die('SQL语句执行失败');
 ```php
 $md5_password = md5($password);
 $sql = "select * from users where username='$username' and password='$md5_password'";
+```
+
+### 5、修复SQL注入漏洞
+
+#### 方案一：处理逻辑问题，**分开查询和判断用户名与密码**
+
+> 用户名和密码的对比放在同一条SQL语句中存在很严重的逻辑问题
+>
+> 应先通过对用户名查询user表，如果确实找到一条记录（用户名唯一的情况下），找到记录后在进行密码的单独对比
+
+```php
+//拼接sql语句并执行
+$md5_password = md5($password);
+$sql = "select * from users where username='$username'";
+$result = mysqli_query($conn,$sql) or die('SQL语句执行失败');
+if (mysqli_num_rows($result) == 1) {
+
+    $row = mysqli_fetch_assoc($result);
+    if($md5_password == $row['password']) {
+        // echo "login-pass";
+        echo '<script>window.alert("login-pass")</script>';
+        // 登录成功，则记录用户session信息
+        $_SESSION['username'] = $username;
+        $_SESSION['islogin'] = TRUE;
+
+        echo '<script>location.href="./welcome.php"</script>';
+    }
+    else {
+        $_SESSION['islogin'] = FALSE ;
+        login_result('login-fail');
+    }
+
+}
+else {
+    // echo "login-fail";
+    $_SESSION['islogin'] = FALSE ;
+    login_result('login-fail');
+}
+```
+
+> 我们来看一下，`mysqli_fetch_assoc`，`mysqli_fetch_all`，`mysqli_fetch_row` 三者的区别
+>
+> - `$row = mysqli_fetch_assoc($result); var_dump($row);`
+>   - 对SQL查询的结果集处理之后的结果，是关联数组
+>
+> ![image-20240602153033714](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240602153033714.png)
+>
+> - `$row = mysqli_fetch_all($result); var_dump($row);`
+>   - 对SQL查询的结果集处理之后的结果，默认是索引数组，参数MYSQLI_NUM代表的也是这个
+>
+> ![image-20240602153526149](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240602153526149.png)
+>
+> - `$row = mysqli_fetch_all($result,MYSQLI_ASSOC); var_dump($row);`
+>   - 对SQL查询的结果集处理之后的结果乃是索引 + 关联数组
+>
+> ![image-20240602153739572](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240602153739572.png)
+>
+> - `$row = mysqli_fetch_row($result); var_dump($row);`
+>   - 对SQL查询的结果集处理之后的结果是索引数组
+>
+> ![image-20240602154156697](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240602154156697.png)
+
+#### 方案二：函数 `addslashes()` 
+
+**可以将字符串中的单引号、双引号、反斜杠、NULL值自动添加转义符，从而防止SQL注入中对单引号和双引号的预防。**
+
+```php
+$username = addslashes($_POST["username"]);
+```
+
+> ```
+> 原始SQL语句如下:
+> $sgl = "select * from user where username='$username' and password='$password'";
+> 如果用户输入 x'or userid=1#' 则SQL语句变成:
+> $sgl = "select * from user where username='x' or userid=1#" and password='$password'";
+> 如果使用addslashes强制为用户输入添加转义符，则变成:
+> $sgl = "select * from user where username='x' or userid=1#\" and password='$password'";
+> 上述SQL语句的用户名为:x\' or userid=1#\'，密码为$password，逻辑上保持不变
+> 如果直接输入 \ ，则如下：
+> $sgl= "select * from user where username='\' and password='$password"
+> ```
+
+## 四、mysqli面向对象的与处理方式修复SQL注入
+
+- **面向过程方式**
+
+```php
+# 面向过程创建数据库连接
+function create_dbcon() {
+    $conn = mysqli_connect('127.0.0.1','root','','woniunote',3306) or die("数据库连接失败");
+    mysqli_set_charset($conn,'utf8');
+    return $conn;
+}
+
+# 面向过程执行和处理SQL查询
+$sql = "select * from users where username='$username'";
+$result = mysqli_query($conn,$sql) or die('SQL语句执行失败'); 
+$row = mysqli_fetch_assoc($result);
+```
+
+- **面向对象方式**
+
+```php
+// 面向对象创建数据库连接
+function create_dbconn_oop() {
+    $conn = new mysqli('192.168.230.147','root','p-0p-0p-0','woniunote',3306) or die("数据库连接失败");
+    // $conn->query('set names utf8');
+    $conn->set_charset('utf8');
+    return $conn;
+}
+
+// 执行SQL语句
+function exec_sql_oop($sql) {
+    $conn = create_dbconn_oop();
+    $result = $conn->query($sql);
+    // 获取行数
+    // echo $result->num_rows;
+
+    $rows = $result->fetch_all(MYSQLI_ASSOC);
+    // var_dump($rows);  // 展示所有处理后的结果集内容
+
+    foreach ($rows as $row) {
+        echo "username : " . $row['username'] . " , password : " . $row['password'] . "</br>";
+    }
+}
+
+exec_sql_oop('select * from users where userid < 6;');
+```
+
+### 1、mysqli与处理功能
+
+```php
+```
+
+
+
+
+
+
+
+配置MySQL临时日志查看SQL语句
+
+在MySQL数据库中运行以下语句，开启临时日志，将日志信息保存到表格MySQL数据库的general_log表中
+
+```sql
+#开启
+USE mysql;
+SET GLOBAL log_output = 'TABLE';
+SET GLOBAL general_log = 'ON';
+#确认
+SHOW VARIABLES LIKE "general_log";
+```
+
+并通过执行以下语句进行查询确认
+
+```sql
+SELECT * FROM general_log WHERE argument LIKE '%username%' ORDER BY thread_id DESC LIMIT 10;
+```
+
+> 正常情况下，general_log是默认关闭的
+>
+> ![image-20240602163253585](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240602163253585.png)
+>
+> 然后执行对应的SQL语句开启
+>
+> ![image-20240602163857085](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240602163857085.png)
+>
+> database : mysql ; table : general_log ;
+
+**MySQLi的与处理功能同样支持面向过程和面向对象**
+
+在处理mysql连接过程中遇到两个问题
+
+```
+$conn = mysqli_connect('localhost','root','','woniunote',3306) or die("数据库连接失败");
+和
+$conn = mysqli_connect('127.0.0.1','root','','woniunote',3306) or die("数据库连接失败");
+和
+$conn = mysqli_connect('192.168.230.147','root','p-0p-0p-0','woniunote',3306) or die("数据库连接失败");
+三者可以正确连接数据库
+但是
+$conn = mysqli_connect('localhost','root','p-0p-0p-0','woniunote',3306) or die("数据库连接失败");
+和
+$conn = mysqli_connect('127.0.0.1','root','','woniunote',3306) or die("数据库连接失败");
+和
+$conn = mysqli_connect('192.168.230.147','root','p-0p-0p-0','woniunote',3306) or die("数据库连接失败");
+三者无法正确连接数据库
+
+意思是本地连接不能用密码（这个我不理解），远程连接数据库必须要用密码（这个我理解）
 ```
 
