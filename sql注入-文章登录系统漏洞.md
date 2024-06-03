@@ -424,18 +424,125 @@ function exec_sql_oop($sql) {
 exec_sql_oop('select * from users where userid < 6;');
 ```
 
-### 1、mysqli与处理功能
+### 1、mysqli预处理功能
 
 ```php
+// MySQLi的预处理功能
+// 主要思想：先用 ? 代替要传的参数，然后绑定参数时传入参数，随后执行
+// 更新类操作：直接执行即可，无需后续操作
+function myself_mysqli_prepare_update() {
+    // 首先创建数据库连接对象
+    $conn = create_dbconn_oop();
+    // 创建预处理语句
+    $updatesql = "update users set username = ? where userid = ?;";
+    // 实例化预处理对象
+    $stmt = $conn->prepare($updatesql);
+    // 设置执行参数
+    $username = '??????';
+    $userid = 9;
+    // 绑定结果参数
+    $stmt->bind_param('si',$username,$userid);
+    // 正式执行SQL语句
+    $stmt->execute(); // execute()方法返回一个布尔类型，表示执行成功与否
+    // $conn->commit(); // 默认情况下，更新类操作会自动提交
+
+}
+
+// 查询类操作：查询完成后需绑定结果参数，即：查询的什么列名，结果参数就是什么，数量一定要对上
+function myself_mysqli_prepare_query() {
+    // 创建数据库连接对象
+    $conn = create_dbconn_oop();
+    // 创建预处理语句
+    $querysql = "select * from users where userid < ?;";
+    // 实例化预处理对象
+    $stmt = $conn->prepare($querysql);
+    // 设置执行参数
+    $userid = 6;
+    // 绑定参数
+    $stmt->bind_param("i", $userid);
+    // 绑定结果参数
+    $stmt->bind_result($userid,$username,$password,$nickname,$avatar,$qq,$role,$credit,$createtime,$updatetime);
+    // 执行查询语句
+    $stmt->execute();
+    // 调用结果并进行处理
+    $stmt->store_result();
+    // 输出行数
+    // $stmt->affected_rows();
+    $stmt->num_rows()."</br>";
+    // 遍历结果
+    while ($stmt->fetch()) {
+        echo $userid . ' ',$username . ' ',$password . '</br>';
+    }
+
+}
+```
+
+### 2、mysqli修复SQL注入漏洞
+
+```php
+<?php
+
+    include "common.php";
+     //POST请求
+    //需要将对应的html页面的请求方式method也改为post
+
+    // 该登录操作没有进行爆破的防护，违背了OWASP-认证和授权失败
+    $username = $_POST["username"];
+    $password = $_POST["password"];
+    $vcode = $_POST["vericode"]; 
+    
+
+    // 验证码登录 启用了万能验证码，存在安全漏洞 OWASP-认证和授权失败
+    if ($vcode === '0000') {
+
+        // 连接到数据库
+        $conn = create_dbconn_oop();
+        $sql = 'select userid,username,password,role from users where username = ?;';
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param('s',$username);
+        $stmt->bind_result($userid,$username2,$password2,$role);
+        $stmt->execute() or die('SQL语句执行失败');
+        $stmt->store_result();
+        
+        if ($stmt->num_rows == 1) {
+            $md5_password = md5($password);
+            $stmt->fetch();
+            if($md5_password == $password2) {
+                // echo "login-pass";
+                echo '<script>window.alert("login-pass")</script>';
+                // 登录成功，则记录用户session信息
+                $_SESSION['username'] = $username;
+                $_SESSION['islogin'] = TRUE;
+
+                echo '<script>location.href="./welcome.php"</script>';
+            }
+            else {
+                $_SESSION['islogin'] = FALSE ;
+                login_result('login-fail');
+            }
+
+        }
+        else {
+            // echo "login-fail";
+            $_SESSION['islogin'] = FALSE ;
+            login_result('login-fail');
+        }
+
+        //关闭数据库
+        mysqli_close($conn);
+
+    }
+    else { 
+        // die("vericode-error");
+        login_result('vericode-error');
+
+    }
+     
+?>
 ```
 
 
-
-
-
-
-
-配置MySQL临时日志查看SQL语句
+配置MySQL临时日志查看预处理之后的SQL语句
 
 在MySQL数据库中运行以下语句，开启临时日志，将日志信息保存到表格MySQL数据库的general_log表中
 
