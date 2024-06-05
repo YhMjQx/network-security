@@ -118,3 +118,108 @@ xampp中的session变量的文件存放路径在 `/opt/lampp/temp`
 
 > 验证码一旦生成后，不一定必须保存在SESSION中，任何可以存储数据的方式均可以，比如数据库，文件，内存，或者保存在Redis的缓存服务器中。比如短信验证码，通常会有一个时间限制（5分钟内有效），最好的解决办法就是使用Redis缓存，并设置key的 过期时间。
 
+
+## 四、SQL注入-登录漏洞-验证码防护
+
+目前的问题是，如果我不刷新login.html页面，就不会调用vcode.php这份代码，也就无法生成新的验证码，并且不刷新login.html页面，SESSION['vcode']也不会改变，那么用户就可以一直使用这个SESSION['vcode']实现不间断的登录请求
+
+![image-20240605205903244](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605205903244.png)
+
+比如此时SESSION['vcode']是6592，那么之后我可以一直使用这个SESSION['vcode']来发送大量的登录请求
+
+![image-20240605211438328](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605211438328.png)
+
+![image-20240605211452952](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605211452952.png)
+
+这样使用同一个SESSION['vcode']一样可以实现爆破的目的
+
+### 1、修复验证码
+
+需要让验证码每取出判断一次就清空SESSION['vcode']，此时，不输入验证码无法登录，输入旧的验证码也登录错误。这样就可以让下一次刷新页面重新获得该验证码，然后再进行登录。
+
+```php
+if ($vcode === '0000' or $_SESSION['vcode']==$vcode) {
+    unset($_SESSION['vcode']);
+
+}
+else { 
+    // die("vericode-error");
+    login_result('vericode-error');
+    unset($_SESSION['vcode']);
+
+}
+```
+
+每次不管验证码输入正确与否都清空SESSION中的的vcode字段
+
+![image-20240605213103626](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605213103626.png)
+
+但是以上代码就会有以下问题：暴露了文件的绝对路径，因此还需要修改
+
+![image-20240605212751668](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605212751668.png)
+
+```php
+if (isset($_SESSION['vcode']) and $vcode === '0000' or $_SESSION['vcode']==$vcode) {
+    unset($_SESSION['vcode']);
+
+}
+else {
+    // die("vericode-error");
+    login_result('vericode-error');
+    unset($_SESSION['vcode']);
+}
+```
+
+## 五、避免使用cookie验证码
+
+SESSION的生成过程，当用户第一次访问服务器时，如果请求中没有带Cookie字段，则服务器会在首次调用session_start()的页面中响应一个SESSION ID，默认命名为：PHPSESSION，响应的字段值如下：
+
+```
+Set-Cookie: PHPSESSID=f00fc086dc2d24f2f50928063b919c0a; path=/
+```
+
+![image-20240605231901006](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605231901006.png)
+
+接下来，后续的每一个请求，将会在请求头的Cookie字段中添加SESSION ID，目的是为了告诉服务器，我是谁
+
+```
+Cookie: PHPSESSID=f00fc086dc2d24f2f50928063b919c0a
+```
+
+![image-20240605232210025](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605232210025.png)
+
+> 也是基于此，存在cookie和SESSION的欺骗
+
+另外，在服务器端也可以直接手工生成Cookie
+
+```php
+// 调用setcookie() 函数自定义生成Cookie，Cookie是保存在客户端的，服务器端本身不保存cookie
+setcookie("vcode",$vcode,time()+3600*24*30*12);
+settcookie(cookie的名字，cookie的值，cookie的超时时间);
+```
+
+> 因为setcookie之后，该cookie会哦保存在客户端浏览器中，当第一次生成之后，在cookie过期之前客户端访问服务器时都会在请求中携带该cookie字段。但是这就存在一种问题如果这个cookie由hack自己生成，然后再发送数据包的时候，hack提前那发送自己的cookie，然后在登录的时候post请求中发送cookie，就可以达到以假乱真的目的
+
+第一个数据包来进行setcookie
+
+![image-20240605235628755](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605235628755.png)
+
+第二个数据包使用自定义cookie来进行登录
+
+![image-20240605235732926](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605235732926.png)
+
+现在我们尝试使用该自定义cookie来composer
+
+![image-20240605235905946](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605235905946.png)
+
+![image-20240605235931426](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605235931426.png)
+
+访问成功
+
+**那么我们随便自定义cookie来发送数据包**
+
+![image-20240606000050069](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240606000050069.png)
+
+直接访问成功
+
+![image-20240606000112191](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240606000112191.png)
