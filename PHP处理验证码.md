@@ -123,13 +123,13 @@ xampp中的session变量的文件存放路径在 `/opt/lampp/temp`
 
 目前的问题是，如果我不刷新login.html页面，就不会调用vcode.php这份代码，也就无法生成新的验证码，并且不刷新login.html页面，SESSION['vcode']也不会改变，那么用户就可以一直使用这个SESSION['vcode']实现不间断的登录请求
 
-![image-20240605205903244](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605205903244.png)
+![image-20240605205903244](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605205903244.png)
 
 比如此时SESSION['vcode']是6592，那么之后我可以一直使用这个SESSION['vcode']来发送大量的登录请求
 
-![image-20240605211438328](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605211438328.png)
+![image-20240605211438328](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605211438328.png)
 
-![image-20240605211452952](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605211452952.png)
+![image-20240605211452952](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605211452952.png)
 
 这样使用同一个SESSION['vcode']一样可以实现爆破的目的
 
@@ -152,11 +152,11 @@ else {
 
 每次不管验证码输入正确与否都清空SESSION中的的vcode字段
 
-![image-20240605213103626](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605213103626.png)
+![image-20240605213103626](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605213103626.png)
 
 但是以上代码就会有以下问题：暴露了文件的绝对路径，因此还需要修改
 
-![image-20240605212751668](C:\Users\hp\AppData\Roaming\Typora\typora-user-images\image-20240605212751668.png)
+![image-20240605212751668](https://gitee.com/ymq_typroa/typroa/raw/main/image-20240605212751668.png)
 
 ```php
 if (isset($_SESSION['vcode']) and $vcode === '0000' or $_SESSION['vcode']==$vcode) {
